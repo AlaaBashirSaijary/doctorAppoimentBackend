@@ -20,6 +20,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\DoctorRatingController;
+use App\Http\Controllers\TranslateController;
+
+Route::get('translate',[TranslateController::class,'getMessage']);
 Route::get('doctor/{doctorId}/ratings',[DoctorRatingController::class,'getDoctorRatings']);
 Route::get('doctors', [DoctorController::class, 'getAllDoctors']); // لعرض جميع الأطباء
 Route::get('doctors/search', [DoctorController::class, 'searchDoctors']); // للبحث عن الأطباء
