@@ -69,7 +69,7 @@ class AuthController extends Controller
     }
    public function signupdoctor(Request $req)
     {
-try {
+   try {
 
             if (!$req->hasFile('certificate')) {
                 return response()->json(['error' => 'Certificate is required'], 422);
@@ -87,7 +87,7 @@ try {
                 'certificate_path' => $certificatePath,
                 'is_verified' => false,
             ]);
-           
+
             $user->assignRole('doctor');
 
             return response()->json(['message' => 'Registration successful. Awaiting admin approval.'], 201);
@@ -104,6 +104,51 @@ try {
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    public function updateProfile(Request $request)
+{
+    $user = Auth::user(); // جلب المستخدم المسجّل دخوله
+
+    if (!$user) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    // قاعدة التحقق من المدخلات
+    $validatedData = $request->validate([
+        'name' => 'string|max:255',
+        'email' => 'email|unique:users,email,' . $user->id,
+        'password' => 'nullable|min:6',
+        'phone_number' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:255',
+        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    // إذا كان المستخدم مريض، السماح بتعديل الأمراض المزمنة
+    if ($user->hasRole('patient')) {
+        $validatedData['chronic_diseases'] = $request->input('chronic_diseases', $user->chronic_diseases);
+    }
+
+    // إذا كان المستخدم طبيب، السماح بتعديل التخصص ورقم الترخيص فقط
+    if ($user->hasRole('doctor')) {
+        $validatedData['specialization'] = $request->input('specialization', $user->specialization);
+        $validatedData['license_number'] = $request->input('license_number', $user->license_number);
+    }
+
+    // حفظ الصورة إذا تم رفعها
+    if ($request->hasFile('profile_image')) {
+        $imagePath = $request->file('profile_image')->store('profile_images', 'public');
+        $validatedData['profile_image'] = $imagePath;
+    }
+
+    // تحديث بيانات المستخدم
+    $user->update($validatedData);
+
+    return response()->json([
+        'message' => 'Profile updated successfully',
+        'user' => $user
+    ]);
+}
+
+
     public function me()
     {
         return response()->json(auth()->user());

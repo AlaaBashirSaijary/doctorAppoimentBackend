@@ -104,4 +104,21 @@ class DoctorController extends Controller
 
            return response()->json(['message' => 'Appointment cancelled successfully.']);
        }
+       public function updateHomeVisitAvailability(Request $request)
+    {
+    $doctor = Auth::user();
+
+    // التحقق مما إذا كان المستخدم دكتور
+    if (!$doctor->hasRole('doctor')) { // إذا كنت تستخدم Spatie Laravel Permission
+        return response()->json(['message' => 'Unauthorized: Only doctors can update this setting'], 403);
+    }
+
+    // تحديث إمكانية الزيارة المنزلية
+    $doctor->update([
+        'can_visit_home' => $request->can_visit_home,
+    ]);
+
+    return response()->json(['message' => 'Home visit availability updated successfully']);
+     }
+
 }

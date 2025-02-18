@@ -37,5 +37,15 @@ class NotificationController extends Controller
 
     return response()->json(['error' => 'Notification not found'], 404);
 }
+public function getUnreadNotifications(Request $request)
+    {
+        $user = $request->user();
+        $notifications = Notification::where('notifiable_id', $user->id)
+            ->where('is_read', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['unread_notifications' => $notifications]);
+    }
 
 }
