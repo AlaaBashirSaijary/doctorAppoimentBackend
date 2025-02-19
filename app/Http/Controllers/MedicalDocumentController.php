@@ -16,7 +16,7 @@ class MedicalDocumentController extends Controller
        $patient = Auth::user(); // الحصول على المريض
 
         // رفع الملف إلى التخزين
-        $filePath = $request->file('file')->store('medical_documents');
+        $filePath = $request->file('file')->store('medical_documents', 'public');
 
         // تخزين البيانات في قاعدة البيانات
         $document = MedicalDocument::create([

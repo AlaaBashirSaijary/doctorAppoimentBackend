@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+use App\Http\Controllers\AlternativeMedicineProductController;
 use App\Http\Controllers\MedicalDocumentController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\NotificationController;
@@ -27,7 +28,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\HomeVisitController;
-
+Route::get('/products', [AlternativeMedicineProductController::class, 'index'])->name('products');
+Route::get('/products/{id}', [AlternativeMedicineProductController::class, 'show']);
 Route::post('/contact', [ContactController::class, 'store']);
 Route::post('/password/email', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
@@ -78,6 +80,9 @@ Route::middleware('auth:api')->post('/notifications/read/{notificationId}', [Not
 Route::middleware('auth:api')->get('available-appointments/{doctorId}', [AppointmentController::class, 'getAvailableAppointments']);
 
 Route::middleware('auth:api', 'role:admin')->group(function () {
+    Route::post('/admin/products', [AlternativeMedicineProductController::class, 'store']);
+    Route::put('/admin/products/{id}', [AlternativeMedicineProductController::class, 'update']);
+    Route::delete('/admin/products/{id}', [AlternativeMedicineProductController::class, 'destroy']);
     Route::get('/messages', [ContactController::class, 'getAllMessages']);
     Route::get('admin/pending-doctors', [AdminController::class, 'getPendingDoctors']);
     Route::get('admin/doctor/{id}/certificate', [AdminController::class, 'getDoctorCertificate']);
