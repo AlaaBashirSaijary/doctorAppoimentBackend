@@ -28,8 +28,13 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\HomeVisitController;
+use App\Http\Controllers\ProductReviewController;
+use App\Http\Controllers\PurchaseController;
+
+Route::get('/products/{productId}/reviews', [ProductReviewController::class, 'index']);
 Route::get('/products', [AlternativeMedicineProductController::class, 'index'])->name('products');
 Route::get('/products/{id}', [AlternativeMedicineProductController::class, 'show']);
+Route::get('/search', [AlternativeMedicineProductController::class, 'search']);
 Route::post('/contact', [ContactController::class, 'store']);
 Route::post('/password/email', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
@@ -59,6 +64,8 @@ Route::middleware(['auth:api', 'role:doctor'])->group(function () {
     Route::put('appointments/{appointmentId}/complete', [AppointmentController::class, 'completeAppointment']);
 });
 Route::middleware(['auth:api', 'role:patient'])->group(function () {
+    Route::post('/purchase', [PurchaseController::class, 'purchase']);
+    Route::post('/products/{productId}/reviews', [ProductReviewController::class, 'store']);
     Route::get('/medical-documents', [MedicalDocumentController::class, 'getPatientDocuments']);
     Route::post('/medical-documents/{documentId}/share/{doctorId}', [MedicalDocumentController::class, 'shareDocumentWithDoctor']);
     Route::post('/medical-documents/upload', [MedicalDocumentController::class, 'uploadDocument']);

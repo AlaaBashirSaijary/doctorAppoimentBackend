@@ -57,5 +57,25 @@ class AlternativeMedicineProductController extends Controller
         AlternativeMedicineProduct::findOrFail($id)->delete();
         return response()->json(['message' => 'Product deleted successfully']);
     }
+    public function search(Request $request)
+{
+    $request->validate([
+        'query' => 'required|string|min:2', // البحث يجب أن يكون على الأقل بحرفين
+    ]);
+
+    $query = strtolower($request->input('query')); // تحويل البحث إلى حروف صغيرة
+
+    $products = AlternativeMedicineProduct::whereRaw('LOWER(name) LIKE ?', ["%$query%"])
+        ->orWhereRaw('LOWER(description) LIKE ?', ["%$query%"])
+        ->orderBy('name', 'asc') // ترتيب النتائج أبجديًا
+        ->get();
+
+    if ($products->isEmpty()) {
+        return response()->json(['message' => 'No products found.'], 404);
+    }
+
+    return response()->json(['products' => $products]);
+}
+
 
 }
